@@ -19,12 +19,14 @@ function [FACT,SSEv,CPUt]=cpNonNeg(X,D,Finit,options)
 %               matrices scaled accordin to n'th root of standard deviation
 %               of data.
 % options       struct with the following fields (optional)
-%                   - options.maxiter: Number of outer iterations by als
+%                   - options.maxiter: Number of outer iterations by ALS
 %                   (default is 250)
 %                   - options.mu: binary - if 1 MU steps
 %                   are taken in the NMF-subproblem (default is 0)
 %                   - options.hals: binary - if 1 HALS steps
 %                   are taken in the NMF-subproblem (default is 1)
+%					NB! Both MU and HALS can be active!
+%
 % Output:
 % FACT          cell array: FACT{i} is the factors found for the i'th
 %               modality
@@ -74,7 +76,7 @@ SSEv=[];
 CPUt=[];
 
 disp([' '])
-disp(['Non Negativity CP optimization'])
+disp(['Non-Negativity Constrained CP optimization'])
 disp(['A ' num2str(D) ' component model will be fitted']);
 disp([' '])
 disp(['To stop algorithm press control C'])
@@ -92,14 +94,14 @@ while dSSE>=1e-6*SSE && iter<maxiter
     
     iter=iter+1;
     SSE_old=SSE;
-    for i=1:Nx
+    for i=1:Nx % solve one factor at a time
         ind=1:Nx;
         ind(i)=[];
         kr=FACT{ind(1)};
         for z=ind(2:end)
             kr=krprod(FACT{z}, kr);
         end
-        % Minimize cost function wrt. to mode using NMF
+        % Minimize cost function wrt. to mode using NMF (cpNonNeg_sub)
         if D>=50 && N(i)>30000 % Memory problems - split up in two subproblems
             nn = N(i)/2;
             [FACT{i}(1:nn,:), SSE1]=cpNonNeg_sub(Xm{i}(1:nn,:),FACT{i}(1:nn,:),kr,Rm{i}(1:nn,:),iter==1,hals,mu);
