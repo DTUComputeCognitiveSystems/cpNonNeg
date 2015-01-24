@@ -2,6 +2,7 @@ cpNonNeg
 =======
 
 This is an implementation of the CANDECOMP/PARAFAC model for tensor factorization of non-negative data. Missing values are handled by marginalization, i.e. ignored during optimization. 
+All implementation was done in MATLAB.
 
 Inlcudes:
 -------
