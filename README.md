@@ -21,16 +21,17 @@ NB! The code will terminate quickly and not neccessarily give meaningful results
 ```matlab
 % example script
 %% Generate synthetic data
+D_true = 5;
 N = [1000 50 25]; % Tensor dimensions
 Nx = length(N);
 F = cell(Nx,1);
 for i = 1:Nx
-        F{i} = rand(N(i),D);
+        F{i} = rand(N(i),D_true);
 end
 
 % Diagonal identity tensor
-I=zeros(D*ones(1,Nx));
-for j=1:D
+I=zeros(D_true*ones(1,Nx));
+for j=1:D_true
         I(j,j,j)=1;
 end
 
@@ -40,22 +41,25 @@ for ip = 2:Nx
         Y=tmult(Y,F{ip},ip);
 end
 
-sig2 = 0.1; % noise level
-X = Y + sqrt(sig2)*randn(N);
+sig2 = 0.5; % noise level
+C = 5; % affine transformation to ensure non-negatitivty
+X = Y + sqrt(sig2)*randn(N) + C*ones(N);
+
+assert(min(X(:))>0);
 
 %% Holdout missing data
-p = 0.05; % holdout percentage (missing data)
+p = 0.20; % holdout fraction (missing data)
 NE = prod(size(X)); % number of elements in tensor
 R = rand(NE,1)>(1-p); % holdout logical indices
 X(R) = nan; % missing values are treated as NaN
 
 %% Model specification
 D = 5; % number of latent componenents in the model
-Finit = cell(ND,1); % initialization of factors (default)
-scale = std(X(:)); % scale of data
+Finit = cell(Nx,1); % initialization of factors (default)
+scale = nanstd(X(:)); % scale of data
 
-for i = 1:ND
-   Finit{i}=(scale.^(1/ND))*rand(N(i),D); 
+for i = 1:Nx
+   Finit{i}=(scale.^(1/Nx))*rand(N(i),D); 
 end
 
 % options
