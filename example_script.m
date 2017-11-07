@@ -17,8 +17,8 @@ for j=1:D_true
         I(j,j,j)=1;
 end
 
-Y=tmult(I,F{1},1);
 % Data tensor
+Y=tmult(I,F{1},1);
 for ip = 2:Nx
         Y=tmult(Y,F{ip},ip);
 end
