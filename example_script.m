@@ -1,6 +1,6 @@
 % Example script for using the CP-model with non-negativity constraints 
-% Written by Søren Føns Vind Nielsen (sfvn at dtu dot dk)
 % - Don't worry that the output looks weird...the input is weird as well
+% Written by Søren Føns Vind Nielsen (sfvn at dtu dot dk)
 
 %% Generate synthetic data
 D_true = 5;
