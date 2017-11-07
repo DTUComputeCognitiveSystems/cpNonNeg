@@ -1,4 +1,7 @@
-% example script
+% Example script for using the CP-model with non-negativity constraints 
+% Written by Søren Føns Vind Nielsen (sfvn at dtu dot dk)
+% - Don't worry that the output looks weird...the input is weird as well
+
 %% Generate synthetic data
 D_true = 5;
 N = [1000 50 25]; % Tensor dimensions
