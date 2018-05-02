@@ -6,7 +6,7 @@ global X2 scale
 [~,D] = size(W);
 [N,M] = size(Xn);
 
-if nargin < 8
+if nargin < 8 || isempty(maxiter)
 	maxiter=M;
 end
 

@@ -26,6 +26,8 @@ function [FACT,SSEv,CPUt]=cpNonNeg(X,D,Finit,options)
 %                   - options.hals: binary - if 1 HALS steps
 %                   are taken in the NMF-subproblem (default is 1)
 %					NB! Both MU and HALS can be active!
+%                   - options.maxiter_sub: Number of inner iterations 
+%                     in solving the NMF problem
 %
 % Output:
 % FACT          cell array: FACT{i} is the factors found for the i'th
@@ -43,10 +45,12 @@ if nargin<4
     options.maxiter = 250;
     options.hals = 1;
     options.mu = 0;
+    options.maxiter_sub = [];
 end
 hals = options.hals;
 mu = options.mu;
 maxiter = options.maxiter;
+maxiter_sub = options.maxiter_sub;
 
 % Missing data
 R = ~isnan(X); % index of present data
@@ -104,11 +108,13 @@ while dSSE>=1e-6*SSE && iter<maxiter
         % Minimize cost function wrt. to mode using NMF (cpNonNeg_sub)
         if D>=50 && N(i)>30000 % Memory problems - split up in two subproblems
             nn = N(i)/2;
-            [FACT{i}(1:nn,:), SSE1]=cpNonNeg_sub(Xm{i}(1:nn,:),FACT{i}(1:nn,:),kr,Rm{i}(1:nn,:),iter==1,hals,mu);
-            [FACT{i}(nn+1:end,:), SSE2]=cpNonNeg_sub(Xm{i}(nn+1:end,:),FACT{i}(nn+1:end,:),kr,Rm{i}(nn+1:end,:),iter==1,hals,mu);
+            [FACT{i}(1:nn,:), SSE1]=cpNonNeg_sub(Xm{i}(1:nn,:),FACT{i}(1:nn,:),...
+                kr,Rm{i}(1:nn,:),iter==1,hals,mu, maxiter_sub);
+            [FACT{i}(nn+1:end,:), SSE2]=cpNonNeg_sub(Xm{i}(nn+1:end,:),...
+                FACT{i}(nn+1:end,:),kr,Rm{i}(nn+1:end,:),iter==1,hals,mu, maxiter_sub);
             SSE = SSE1 + SSE2;
         else
-            [FACT{i}, SSE]=cpNonNeg_sub(Xm{i},FACT{i},kr,Rm{i},iter==1,hals,mu);
+            [FACT{i}, SSE]=cpNonNeg_sub(Xm{i},FACT{i},kr,Rm{i},iter==1,hals,mu, maxiter_sub);
         end
     end   
     dSSE=SSE_old-SSE;
