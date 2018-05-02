@@ -70,7 +70,7 @@ while (k < maxiter && cost_diff >= tol*cost_eval) % Updating W
     
     % HALS update
     if ~initialize && hals
-        for d = 1:D % columnwise update            
+        for d = randperm(D) % columnwise update            
             W(:,d) = max(0,(XHt(:,d)-(sum(RHH(:,IND(d,:)).*W(:,idx_not_d(d,:)),2)))./RHH(:,h2ind(d)));
         end
     end
